@@ -1,55 +1,56 @@
 package eye
 
 import (
-	"fmt"
-	"strconv"
-	"strings"
+	"log"
+	"path"
+	"runtime"
 )
 
 const VERSION = "1.0.0"
 
 var (
-	EyeApp    *App
-	HttpAddr  string
-	HttpPort  int
-	ListenTCP bool
-	Graceful  bool
+	EyeApp *App
 )
 
-/*func Router(uri string, c ControllerInterface, mappingMethods ...string) *App {
+// addr:Tcp:127.0.0.1:9001 or Tcp::9001
+/*func Listen(addr string, Mux *Router) {
+	sAddr := strings.Split(addr, ":")
+	HttpProtocol := sAddr[0]
+	HttpAddr := fmt.Sprintln("%s:%s", sAddr[1], sAddr[2])
 
+	EyeApp.AddServer(HttpProtocol, HttpAddr, Mux)
 }*/
 
-type Eye struct {
-	Host string
+//run
+/*func Run(addr string, Mux *Router) {
+	sAddr := strings.Split(addr, ":")
+	HttpProtocol := sAddr[0]
+	HttpAddr := fmt.Sprintln("%s:%s", sAddr[1], sAddr[2])
+	EyeApp.AddServer(HttpProtocol, HttpAddr, Mux)
+
+	EyeApp.Run()
+}*/
+
+func Router(rootpath string, c IController, mappingMethods ...string) *App {
+	EyeApp.Handlers.Add(rootpath, c, mappingMethods...)
+	return EyeApp
 }
 
-func newEye(host string) *Eye {
-	return &Eye{Host: host}
+func RESTRouter(rootpath string, c IController) *App {
+	Router(rootpath, c)
+	Router(path.Join(rootpath, ":objectId"), c)
+	return EyeApp
 }
 
-func Run(params ...string) {
-	if len(params) > 0 && params[0] != "" {
-		strs := strings.Split(params[0], ":")
-		if len(strs) > 0 && strs[0] != "" {
-			HttpAddr = strs[0]
-		}
-		if len(strs) > 1 && strs[1] != "" {
-			HttpPort, _ = strconv.Atoi(strs[1])
-		}
-	}
-}
-
-func Rounter(uri string, controller *IController) {
-	fmt.Println(uri, controller)
+func Run() {
+	EyeApp.Run()
 }
 
 //////////// 包初始化  /////////////
 func init() {
-	//初始化配置
+	//初始化默认配置
 	EyeApp = NewApp()
-	HttpAddr = ""
-	HttpPort = 9002
-	ListenTCP = true
-	Graceful = true
+
+	runtime.GOMAXPROCS(runtime.NumCPU())
+	log.Println("[Eye]Run As NumCPU:", runtime.NumCPU())
 }

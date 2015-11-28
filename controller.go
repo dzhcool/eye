@@ -1,18 +1,20 @@
 package eye
 
-import ()
-
-type ControllerRegistor struct {
-}
+import (
+	"fmt"
+	"github.com/dzhcool/eye/context"
+)
 
 type Controller struct {
 	controllerName string
 	actionName     string
-	app            interface{}
+	AppController  interface{}
+	Req            *context.Context
+	Resp           []map[interface{}]interface{}
 }
 
 type IController interface {
-	Init(controllerName, actionName string, app interface{})
+	Init(context *context.Context, actionName string, app IController)
 	Prepare()
 	Get()
 	Post()
@@ -24,13 +26,52 @@ type IController interface {
 	Finish()
 	Display() error
 	HandlerFunc(fn string) bool
+	Name() string
 }
 
-func NewControllerRegister() {
-}
-
-func (p *Controller) Init(controllerName, actionName string, app interface{}) {
-	p.controllerName = controllerName
+func (p *Controller) Init(context *context.Context, actionName string, app IController) {
+	p.Req = context
+	p.controllerName = app.Name()
 	p.actionName = actionName
-	p.app = app
+	p.AppController = app
+}
+
+func (p *Controller) Prepare() {
+}
+
+func (p *Controller) Get() {
+}
+
+func (p *Controller) Post() {
+}
+
+func (p *Controller) Delete() {
+}
+
+func (p *Controller) Put() {
+}
+
+func (p *Controller) Head() {
+}
+
+func (p *Controller) Patch() {
+}
+
+func (p *Controller) Options() {
+}
+
+func (p *Controller) Finish() {
+}
+
+func (p *Controller) Display() error {
+	fmt.Println("[controller]Display")
+	return nil
+}
+
+func (p *Controller) HandlerFunc(fn string) bool {
+	return false
+}
+
+func (p *Controller) Name() string {
+	return p.controllerName
 }
