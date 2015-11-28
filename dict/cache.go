@@ -1,6 +1,6 @@
 /**
  * 数据存储定义
- * @author dangzihao
+ * @author dzh
  * @date 2015-08-05
  */
 package dict
@@ -66,7 +66,6 @@ func (p *CacheTable) Get(k interface{}) (interface{}, error) {
 	r, ok := p.items[k]
 	// r.Lock()
 	// defer r.Unlock()
-
 	if !ok {
 		return nil, ErrNil
 	}

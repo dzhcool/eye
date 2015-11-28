@@ -1,6 +1,6 @@
 /**
  * 数据存储定义
- * @author dangzihao
+ * @author dzh
  * @date 2015-08-05
  */
 package dict

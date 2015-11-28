@@ -1,5 +1,5 @@
 /**
- * 广告数据存储定义
+ * test
  * @date 2015-08-05
  */
 package dict
