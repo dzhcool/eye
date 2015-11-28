@@ -7,7 +7,9 @@ import (
 	"strings"
 )
 
-var Env = make(map[string]string)
+var (
+	Env map[string]string //全局配置
+)
 
 func NewEnv(filename string) {
 	if filename == "" {
@@ -35,5 +37,6 @@ func NewEnv(filename string) {
 }
 
 func init() {
+	Env = make(map[string]string)
 	NewEnv(fmt.Sprintf("%s/conf/env.conf", os.Getenv("GOPATH")))
 }

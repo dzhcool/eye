@@ -2,8 +2,7 @@ package eye
 
 import (
 	eyecontext "github.com/dzhcool/eye/context"
-	// "log"
-	"errors"
+	"log"
 	"net/http"
 	"reflect"
 	"strings"
@@ -41,7 +40,7 @@ func NewControllerRegister() *ControllerRegistor {
 }
 
 func (p *ControllerRegistor) Add(rootpath string, c IController, mappingMethods ...string) {
-	rootpath = p.Path(strings.ToLower(rootpath))
+	rootpath = p.Path(strings.ToUpper(rootpath))
 	item, ok := EyeApp.Handlers.Mux[rootpath]
 	if !ok {
 		reflectVal := reflect.ValueOf(c)
@@ -55,33 +54,24 @@ func (p *ControllerRegistor) Add(rootpath string, c IController, mappingMethods 
 		for _, single := range multi {
 			mappings := strings.Split(single, ":")
 			if len(mappings) == 1 {
-				item.Methods["get"] = mappings[0]
+				fun := strings.ToUpper(mappings[0][0:1]) + strings.ToLower(mappings[0][1:])
+				for k, _ := range HTTPMETHOD {
+					item.Methods[strings.ToUpper(k)] = fun
+				}
 			}
 			if len(mappings) == 2 {
 				methods := strings.Split(mappings[0], ",")
 				for _, method := range methods {
-					item.Methods[strings.ToLower(method)] = mappings[1]
+					item.Methods[strings.ToUpper(method)] = mappings[1]
 				}
 			}
 		}
 	} else {
 		for k, v := range HTTPMETHOD {
 			fun := strings.ToUpper(v[0:1]) + strings.ToLower(v[1:])
-			item.Methods[strings.ToLower(k)] = fun
+			item.Methods[strings.ToUpper(k)] = fun
 		}
 	}
-
-}
-
-func (p *ControllerRegistor) getRouter(rootpath string, method string) (string, error) {
-	rootpath = p.Path(rootpath)
-	if item, ok := EyeApp.Handlers.Mux[rootpath]; ok {
-		if fun, ok := item.Methods[strings.ToLower(method)]; ok {
-			return fun, nil
-		}
-	}
-
-	return "", errors.New("Router not found")
 }
 
 func (p *ControllerRegistor) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
@@ -96,8 +86,11 @@ func (p *ControllerRegistor) ServeHTTP(rw http.ResponseWriter, r *http.Request) 
 	context.Output.Context = context
 	context.Output.EnableGzip = false
 
+	defer p.recoverPanic(context)
+
 	path := p.Path(r.URL.Path)
-	ritem, ok := p.Mux[path]
+	netMethod := strings.ToUpper(r.Method)
+	ritem, ok := EyeApp.Handlers.Mux[path]
 	if !ok {
 		panic("route is not exist")
 	}
@@ -106,9 +99,10 @@ func (p *ControllerRegistor) ServeHTTP(rw http.ResponseWriter, r *http.Request) 
 	if !ok {
 		panic("controller is not IController")
 	}
-	actionName, err := p.getRouter(path, r.Method)
-	if err != nil {
-		panic("action is not exist")
+
+	actionName, ok := ritem.Methods[netMethod]
+	if !ok {
+		actionName = netMethod
 	}
 
 	//call controller Init()
@@ -118,10 +112,27 @@ func (p *ControllerRegistor) ServeHTTP(rw http.ResponseWriter, r *http.Request) 
 	execController.Prepare()
 
 	//call action
-	if len(actionName) > 0 {
-		in := make([]reflect.Value, 0)
-		method := vc.MethodByName(actionName)
-		method.Call(in)
+	switch actionName {
+	case "GET":
+		execController.Get()
+	case "POST":
+		execController.Post()
+	case "DELETE":
+		execController.Delete()
+	case "PUT":
+		execController.Put()
+	case "HEAD":
+		execController.Head()
+	case "PATCH":
+		execController.Patch()
+	case "OPTIONS":
+		execController.Options()
+	default:
+		if len(actionName) > 0 {
+			in := make([]reflect.Value, 0)
+			method := vc.MethodByName(actionName)
+			method.Call(in)
+		}
 	}
 	if context.Output.Status == 0 {
 		http.NotFound(rw, r)
@@ -134,6 +145,19 @@ func (p *ControllerRegistor) Path(path string) string {
 		path = "/"
 	}
 	return path
+}
+
+func (p *ControllerRegistor) recoverPanic(context *eyecontext.Context) {
+	if err := recover(); err != nil {
+		if Env["GOERROR"] == "1" {
+			log.Println("[Eye][Panic]", err)
+		}
+		if context.Output.Status == 0 {
+			http.Error(context.ResponseWriter, "404 Not Found", 404)
+		}
+		//todo 根据页面类型判断输出报错信息
+		return
+	}
 }
 
 //responseWriter is a wrapper for the http.ResponseWriter

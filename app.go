@@ -30,7 +30,7 @@ func (p *App) Run() {
 			endless.DefaultWriteTimeOut = 5 * time.Second
 			err := endless.ListenAndServe(addr, p.Handlers)
 			if err != nil {
-				log.Println("[Eey]", "Listen error:", err)
+				log.Println("[Eey]Listen error:", err)
 			}
 			log.Println(fmt.Sprintf("[Eye]Server on %s stopped", addr))
 			running <- true
@@ -45,7 +45,7 @@ func (p *App) Run() {
 			}
 			err := server.ListenAndServe()
 			if err != nil {
-				log.Println("[Eey]", "Listen error:", err)
+				log.Println("[Eey]Listen error:", err)
 			}
 			log.Println(fmt.Sprintf("[Eye]Server on %s stopped", addr))
 			running <- true

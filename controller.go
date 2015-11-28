@@ -1,8 +1,8 @@
 package eye
 
 import (
-	"fmt"
 	"github.com/dzhcool/eye/context"
+	"net/http"
 )
 
 type Controller struct {
@@ -40,31 +40,46 @@ func (p *Controller) Prepare() {
 }
 
 func (p *Controller) Get() {
+	p.Req.Output.SetStatus(405)
+	http.Error(p.Req.ResponseWriter, "Method Not Allowed", 405)
 }
 
 func (p *Controller) Post() {
+	p.Req.Output.SetStatus(405)
+	http.Error(p.Req.ResponseWriter, "Method Not Allowed", 405)
 }
 
 func (p *Controller) Delete() {
+	p.Req.Output.SetStatus(405)
+	http.Error(p.Req.ResponseWriter, "Method Not Allowed", 405)
 }
 
 func (p *Controller) Put() {
+	p.Req.Output.SetStatus(405)
+	http.Error(p.Req.ResponseWriter, "Method Not Allowed", 405)
 }
 
 func (p *Controller) Head() {
+	p.Req.Output.SetStatus(405)
+	http.Error(p.Req.ResponseWriter, "Method Not Allowed", 405)
 }
 
 func (p *Controller) Patch() {
+	p.Req.Output.SetStatus(405)
+	http.Error(p.Req.ResponseWriter, "Method Not Allowed", 405)
 }
 
 func (p *Controller) Options() {
+	p.Req.Output.SetStatus(405)
+	http.Error(p.Req.ResponseWriter, "Method Not Allowed", 405)
 }
 
 func (p *Controller) Finish() {
+	p.Req.Output.SetStatus(405)
+	http.Error(p.Req.ResponseWriter, "Method Not Allowed", 405)
 }
 
 func (p *Controller) Display() error {
-	fmt.Println("[controller]Display")
 	return nil
 }
 
