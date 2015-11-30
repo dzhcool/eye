@@ -2,7 +2,6 @@ package eye
 
 import (
 	"log/syslog"
-	"os"
 )
 
 var (
@@ -93,7 +92,7 @@ func (this *XLogger) Error(str string) {
 }
 
 func init() {
-	logName = os.Getenv("PRJ_NAME")
-	logLevel = os.Getenv("LOGLEVEL")
+	logName = Env["PRJ_NAME"]
+	logLevel = Env["LOGLEVEL"]
 	loggers = make(map[string]*XLogger)
 }
