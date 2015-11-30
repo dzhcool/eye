@@ -2,6 +2,7 @@ package eye
 
 import (
 	"log/syslog"
+	"runtime"
 )
 
 var (
@@ -10,6 +11,7 @@ var (
 	logLevel string
 )
 
+const callerLevel = 3
 const (
 	LevelDebug = iota
 	LevelInfo
@@ -70,25 +72,41 @@ func (this *XLogger) Logger() *syslog.Writer {
 	return this.logWriter
 }
 
-func (this *XLogger) Debug(str string) {
+func (this *XLogger) Debug(str string, evts ...string) {
+	evt := this.caller(callerLevel, evts...)
 	if this.logLevel <= LevelDebug {
-		this.Logger().Info(" [debug] " + str)
+		this.Logger().Info("evt[" + evt + "] [debug] " + str)
 	}
 }
-func (this *XLogger) Info(str string) {
+func (this *XLogger) Info(str string, evts ...string) {
+	evt := this.caller(callerLevel, evts...)
 	if this.logLevel <= LevelInfo {
-		this.Logger().Info(" [info] " + str)
+		this.Logger().Info("evt[" + evt + "] [info] " + str)
 	}
 }
-func (this *XLogger) Warn(str string) {
+func (this *XLogger) Warn(str string, evts ...string) {
+	evt := this.caller(callerLevel, evts...)
 	if this.logLevel <= LevelWarn {
-		this.Logger().Info(" [warn] " + str)
+		this.Logger().Info("evt[" + evt + "] [warn] " + str)
 	}
 }
-func (this *XLogger) Error(str string) {
+func (this *XLogger) Error(str string, evts ...string) {
+	evt := this.caller(callerLevel, evts...)
 	if this.logLevel <= LevelError {
-		this.Logger().Info(" [error] " + str)
+		this.Logger().Info("evt[" + evt + "] [error] " + str)
 	}
+}
+
+//获取调用者方法名
+func (this *XLogger) caller(level int, evts ...string) string {
+	evt := ""
+	if len(evts) <= 0 {
+		pc, _, _, _ := runtime.Caller(level)
+		evt = runtime.FuncForPC(pc).Name()
+	} else {
+		evt = evts[0]
+	}
+	return evt
 }
 
 func init() {
