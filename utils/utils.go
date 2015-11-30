@@ -205,7 +205,7 @@ func GetUrl(url string) (string, error) {
 
 func SendQueueMsg(data map[string]string) error {
 	if msg, num, err := qhydra.QMsg.Trigger(data, ""); err != nil {
-		logkit.Logger.Error("qhydra.Trigger:"+fmt.Sprintf("msg:%s,num:%d", msg, num), "utils/sendQueueMsg")
+		eye.NewLogger("_ego").Error("qhydra.Trigger:"+fmt.Sprintf("msg:%s,num:%d", msg, num), "utils/sendQueueMsg")
 		return err
 	} else {
 		return nil

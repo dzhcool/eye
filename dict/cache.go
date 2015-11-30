@@ -6,8 +6,8 @@
 package dict
 
 import (
-	"common/utils"
 	"errors"
+	"github.com/dzhcool/eye/utils"
 	"sync"
 	"time"
 )
@@ -49,20 +49,20 @@ func (p *CacheTable) Count(k interface{}, v interface{}) int {
 	return num
 }
 
-func (p *CacheTable) Set(k interface{}, v interface{}, l ...int64) *CacheItem {
+func (p *CacheTable) Set(k interface{}, v interface{}, l ...int) *CacheItem {
 	p.RLock()
 	defer p.RUnlock()
 
 	lifetime := 0 * time.Second
 	if len(l) > 0 {
-		lifetime = l[0] * time.Second
+		lifetime = time.Duration(l[0]) * time.Second
 	}
-	item := createCacheItem(k, v, l)
+	item := createCacheItem(k, v, lifetime)
 	p.items[k] = &item
 	return &item
 }
 
-func (p *CacheTable) Add(k interface{}, v interface{}, l ...int64) *CacheItem {
+func (p *CacheTable) Add(k interface{}, v interface{}, l ...int) *CacheItem {
 	return p.Set(k, v, l...)
 }
 
