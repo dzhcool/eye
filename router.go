@@ -54,9 +54,10 @@ func (p *ControllerRegistor) Add(rootpath string, c IController, mappingMethods 
 		for _, single := range multi {
 			mappings := strings.Split(single, ":")
 			if len(mappings) == 1 {
-				fun := strings.ToUpper(mappings[0][0:1]) + strings.ToLower(mappings[0][1:])
+				fun := strings.ToUpper(mappings[0][0:1]) + mappings[0][1:]
 				for k, _ := range HTTPMETHOD {
 					item.Methods[strings.ToUpper(k)] = fun
+					p.Add(rootpath+"/"+fun, c, k+":"+fun) //ext "Users;Del"
 				}
 			}
 			if len(mappings) == 2 {
@@ -91,6 +92,7 @@ func (p *ControllerRegistor) ServeHTTP(rw http.ResponseWriter, r *http.Request) 
 	path := p.Path(r.URL.Path)
 	netMethod := strings.ToUpper(r.Method)
 	ritem, ok := EyeApp.Handlers.Mux[path]
+	// log.Println(ritem, netMethod)
 	if !ok {
 		panic("route is not exist")
 	}

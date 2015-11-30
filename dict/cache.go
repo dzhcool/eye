@@ -49,17 +49,21 @@ func (p *CacheTable) Count(k interface{}, v interface{}) int {
 	return num
 }
 
-func (p *CacheTable) Set(k interface{}, v interface{}, l time.Duration) *CacheItem {
+func (p *CacheTable) Set(k interface{}, v interface{}, l ...int64) *CacheItem {
 	p.RLock()
 	defer p.RUnlock()
 
+	lifetime := 0 * time.Second
+	if len(l) > 0 {
+		lifetime = l[0] * time.Second
+	}
 	item := createCacheItem(k, v, l)
 	p.items[k] = &item
 	return &item
 }
 
-func (p *CacheTable) Add(k interface{}, v interface{}, l time.Duration) *CacheItem {
-	return p.Set(k, v, l)
+func (p *CacheTable) Add(k interface{}, v interface{}, l ...int64) *CacheItem {
+	return p.Set(k, v, l...)
 }
 
 func (p *CacheTable) Get(k interface{}) (interface{}, error) {

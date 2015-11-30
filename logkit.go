@@ -16,6 +16,7 @@ const (
 	LevelInfo
 	LevelWarn
 	LevelError
+	LevelNone
 )
 
 var LoggerLevel = map[string]int{
@@ -23,6 +24,7 @@ var LoggerLevel = map[string]int{
 	"info":  LevelInfo,
 	"warn":  LevelWarn,
 	"error": LevelError,
+	"none":  LevelNone,
 }
 
 type XLogger struct {
