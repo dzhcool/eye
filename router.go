@@ -151,7 +151,7 @@ func (p *ControllerRegistor) Path(path string) string {
 
 func (p *ControllerRegistor) recoverPanic(context *eyecontext.Context) {
 	if err := recover(); err != nil {
-		if Env["GOERROR"] == "1" {
+		if Env["LOGLEVEL"] == "debug" {
 			log.Println("[Eye][Panic]", err)
 		}
 		if context.Output.Status == 0 {
