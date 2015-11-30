@@ -15,8 +15,8 @@ import (
 	"strings"
 	"text/template"
 	// "time"
-	"common/logkit"
-	"common/qhydra"
+	"github.com/dzhcool/eye"
+	"github.com/dzhcool/eye/qhydra"
 )
 
 func Trace(msg string) {
