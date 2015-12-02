@@ -11,10 +11,12 @@ type RestCtx struct {
 	Errno  int    `json:"error"`
 	Errmsg string `json:"errmsg"`
 	Count  int    `json:"count"`
+
+	callbackName string
 }
 
 type IRestCtx interface {
-	JsonByte()
+	Prepare()
 }
 
 func (p *RestCtx) Prepare() {
