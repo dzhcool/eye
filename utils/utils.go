@@ -95,15 +95,21 @@ func Md5(val string) string {
 	return secret
 }
 
-//处理轮数 *****  和项目相关
-func Round(all int, size int) int {
-	if size <= 0 {
-		size = 1
-	}
-	mod := all % size
+//mod
+func Mod(num, div int) int {
+	mod := num % div
 	if mod <= 0 {
 		mod = size
 	}
+	return mod
+}
+
+//处理轮数 *****  和项目相关
+func Round(all, size int) int {
+	if size <= 0 {
+		size = 1
+	}
+	mod := Mod(all, size)
 	round := 100 + mod
 	return round
 }
