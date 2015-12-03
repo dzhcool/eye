@@ -49,15 +49,15 @@ func (ctx *Context) SetCookie(name string, value string, others ...interface{}) 
 
 //json接口返回
 func (ctx *Context) Success(content string) error {
-	ctx.output.Header("Content-Type", "application/json; charset=utf-8")
+	ctx.Output.Header("Content-Type", "application/json; charset=utf-8")
 	ctx.Output.Status = 200
 	ctx.WriteString(content)
 	return nil
 }
 
 func (ctx *Context) Error(msg string, code int) error {
-	output.Header("Content-Type", "application/json; charset=utf-8")
-	Output.Status = 200
+	ctx.Output.Header("Content-Type", "application/json; charset=utf-8")
+	ctx.Output.Status = 200
 	ctx.WriteString([]byte(fmt.Sprintf(`{"error":%d,"errmsg":"%s", "data":[]}`, code, msg)))
 	return nil
 }
