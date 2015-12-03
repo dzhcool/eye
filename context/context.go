@@ -48,16 +48,16 @@ func (ctx *Context) SetCookie(name string, value string, others ...interface{}) 
 }
 
 //json接口返回
-func (ctx *Context) Success(content string) error {
+func (ctx *Context) Success(body string) error {
 	ctx.Output.Header("Content-Type", "application/json; charset=utf-8")
 	ctx.Output.Status = 200
-	ctx.WriteString(content)
+	ctx.ResponseWriter.Write([]byte(body))
 	return nil
 }
 
 func (ctx *Context) Error(msg string, code int) error {
 	ctx.Output.Header("Content-Type", "application/json; charset=utf-8")
 	ctx.Output.Status = 200
-	ctx.WriteString([]byte(fmt.Sprintf(`{"error":%d,"errmsg":"%s", "data":[]}`, code, msg)))
+	ctx.ResponseWriter.Write([]byte(fmt.Sprintf(`{"error":%d,"errmsg":"%s", "data":[]}`, code, msg)))
 	return nil
 }
