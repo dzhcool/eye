@@ -99,7 +99,7 @@ func Md5(val string) string {
 func Mod(num, div int) int {
 	mod := num % div
 	if mod <= 0 {
-		mod = size
+		mod = div
 	}
 	return mod
 }
