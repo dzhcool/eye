@@ -361,17 +361,16 @@ func stringsToJson(str string) string {
 /*func (output *EyeOutput) Session(name interface{}, value interface{}) {
 	output.Context.Input.CruSession.Set(name, value)
 }*/
-/*func (output *EyeOutput) JsonSim(data IRestful) error {
+func (output *EyeOutput) Success(content string) error {
 	output.Header("Content-Type", "application/json; charset=utf-8")
-	var content []byte
-	var err error
-	if err != nil {
-		http.Error(output.Context.ResponseWriter, err.Error(), http.StatusInternalServerError)
-		return err
-	}
-	if coding {
-		content = []byte(stringsToJson(string(content)))
-	}
-	output.Body(content)
+	Output.Status = 200
+	output.Body([]byte(content))
 	return nil
-}*/
+}
+
+func (output *EyeOutput) Error(msg string, code int) error {
+	output.Header("Content-Type", "application/json; charset=utf-8")
+	Output.Status = 200
+	output.Body([]byte(fmt.Sprintf(`{"error":%d,"errmsg":"%s", "data":[]}`, code, msg)))
+	return nil
+}

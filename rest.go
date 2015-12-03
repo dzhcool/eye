@@ -17,6 +17,8 @@ type RestCtx struct {
 
 type IRestCtx interface {
 	Prepare()
+	JsonByte()
+	JsonString()
 }
 
 func (p *RestCtx) Prepare() {
