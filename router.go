@@ -140,9 +140,9 @@ func (p *ControllerRegistor) ServeHTTP(rw http.ResponseWriter, r *http.Request) 
 			method.Call(in)
 		}
 	}
-	if context.Output.Status == 0 {
-		http.NotFound(rw, r)
-	}
+	// if context.Output.Status == 0 {
+	// 	http.NotFound(rw, r)
+	// }
 }
 
 func (p *ControllerRegistor) Path(path string) string {
