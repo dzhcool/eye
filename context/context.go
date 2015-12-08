@@ -3,7 +3,7 @@
 package context
 
 import (
-	"fmt"
+	"bytes"
 	"net/http"
 	"text/template"
 )
@@ -50,13 +50,19 @@ func (ctx *Context) SetCookie(name string, value string, others ...interface{}) 
 }
 
 //json接口返回
-func (ctx *Context) WriteJson(content string) error {
+func (ctx *Context) WriteJson(content []byte) error {
 	ctx.Output.Header("Content-Type", "application/json; charset=utf-8")
 	ctx.Output.Status = 200
-	callback := template.HTMLEscapeString(ctx.Input.Query("_callback"))
+	callback := template.JSEscapeString(ctx.Input.Query("_callback"))
 	if len(callback) > 0 {
-		content = fmt.Sprintf(" %s(%s)\r\n", callback, content)
+		bt := bytes.NewBufferString(" " + callback)
+		bt.WriteString("(")
+		bt.Write(content)
+		bt.WriteString(");\r\n")
+		ctx.Output.Body(bt.Bytes())
+	} else {
+		ctx.Output.Body(content)
 	}
-	ctx.Output.Body([]byte(content))
+
 	return nil
 }
