@@ -5,6 +5,7 @@ package context
 import (
 	"fmt"
 	"net/http"
+	"text/template"
 )
 
 // Http request context struct including BeegoInput, BeegoOutput, http.Request and http.ResponseWriter.
@@ -49,16 +50,13 @@ func (ctx *Context) SetCookie(name string, value string, others ...interface{}) 
 }
 
 //json接口返回
-func (ctx *Context) Success(body string) error {
+func (ctx *Context) WriteJson(content string) error {
 	ctx.Output.Header("Content-Type", "application/json; charset=utf-8")
 	ctx.Output.Status = 200
-	ctx.ResponseWriter.Write([]byte(body))
-	return nil
-}
-
-func (ctx *Context) Error(msg string, code int) error {
-	ctx.Output.Header("Content-Type", "application/json; charset=utf-8")
-	ctx.Output.Status = 200
-	ctx.ResponseWriter.Write([]byte(fmt.Sprintf(`{"error":%d,"errmsg":"%s", "data":[]}`, code, msg)))
+	callback := template.HTMLEscapeString(ctx.Input.Query("_callback"))
+	if len(callback) > 0 {
+		content = fmt.Sprintf(" %s(%s)\r\n", callback, content)
+	}
+	ctx.Output.Body([]byte(content))
 	return nil
 }

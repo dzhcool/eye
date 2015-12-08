@@ -85,7 +85,11 @@ func (p *ControllerRegistor) ServeHTTP(rw http.ResponseWriter, r *http.Request) 
 		Output:         eyecontext.NewOutput(),
 	}
 	context.Output.Context = context
-	context.Output.EnableGzip = false
+	if strings.ToLower(Env["GOGZIP"]) == "on" {
+		context.Output.EnableGzip = true
+	} else {
+		context.Output.EnableGzip = false
+	}
 
 	defer p.recoverPanic(context)
 
