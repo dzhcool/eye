@@ -1,6 +1,7 @@
 package eye
 
 import (
+	"fmt"
 	eyecontext "github.com/dzhcool/eye/context"
 	"log"
 	"net/http"
@@ -98,7 +99,7 @@ func (p *ControllerRegistor) ServeHTTP(rw http.ResponseWriter, r *http.Request) 
 	ritem, ok := EyeApp.Handlers.Mux[path]
 	// log.Println(ritem, netMethod)
 	if !ok {
-		panic("route is not exist")
+		panic(fmt.Sprintf("route is not exist path:%s", path))
 	}
 	vc := reflect.New(ritem.ControllerType)
 	execController, ok := vc.Interface().(IController)
