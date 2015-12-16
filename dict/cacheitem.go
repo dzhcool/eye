@@ -45,6 +45,8 @@ func (p *CacheItem) Data() interface{} {
 }
 
 func (p *CacheItem) Expired() bool {
+	p.RLock()
+	defer p.RUnlock()
 	if p.life > 0 && time.Now().Sub(p.addTime) >= p.life {
 		return true
 	}
