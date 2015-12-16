@@ -2,6 +2,7 @@ package eye
 
 import (
 	"log/syslog"
+	"os"
 	"runtime"
 )
 
@@ -9,6 +10,9 @@ var (
 	loggers  map[string]*XLogger //日志
 	logName  string
 	logLevel string
+	logEnv   string
+	logSys   string
+	logUser  string
 )
 
 const callerLevel = 3
@@ -73,44 +77,51 @@ func (this *XLogger) Logger() *syslog.Writer {
 }
 
 func (this *XLogger) Debug(str string, evts ...string) {
-	evt := this.caller(callerLevel, evts...)
+	tag, evt := this.caller(callerLevel, evts...)
 	if this.logLevel <= LevelDebug {
-		this.Logger().Info("evt[" + evt + "] [debug] " + str)
+		this.Logger().Info("tag[" + tag + "] " + "evt[" + evt + "] [debug] " + str)
 	}
 }
 func (this *XLogger) Info(str string, evts ...string) {
-	evt := this.caller(callerLevel, evts...)
+	tag, evt := this.caller(callerLevel, evts...)
 	if this.logLevel <= LevelInfo {
-		this.Logger().Info("evt[" + evt + "] [info] " + str)
+		this.Logger().Info("tag[" + tag + "] " + "evt[" + evt + "] [info] " + str)
 	}
 }
 func (this *XLogger) Warn(str string, evts ...string) {
-	evt := this.caller(callerLevel, evts...)
+	tag, evt := this.caller(callerLevel, evts...)
 	if this.logLevel <= LevelWarn {
-		this.Logger().Info("evt[" + evt + "] [warn] " + str)
+		this.Logger().Info("tag[" + tag + "] " + "evt[" + evt + "] [warn] " + str)
 	}
 }
 func (this *XLogger) Error(str string, evts ...string) {
-	evt := this.caller(callerLevel, evts...)
+	tag, evt := this.caller(callerLevel, evts...)
 	if this.logLevel <= LevelError {
-		this.Logger().Info("evt[" + evt + "] [error] " + str)
+		this.Logger().Info("tag[" + tag + "] " + "evt[" + evt + "] [error] " + str)
 	}
 }
 
 //获取调用者方法名
-func (this *XLogger) caller(level int, evts ...string) string {
+func (this *XLogger) caller(level int, evts ...string) (string, string) {
 	evt := ""
+	tag := logEnv + ",&" + logSys
 	if len(evts) <= 0 {
 		pc, _, _, _ := runtime.Caller(level)
 		evt = runtime.FuncForPC(pc).Name()
 	} else {
 		evt = evts[0]
 	}
-	return evt
+	return tag, evt
 }
 
 func init() {
-	logName = Env["PRJ_NAME"]
-	logLevel = Env["LOGLEVEL"]
+	logName = os.Getenv("PRJ_NAME")
+	logLevel = os.Getenv("LOGLEVEL")
+	logEnv = os.Getenv("ENV")
+	logSys = os.Getenv("APP_SYS")
+	logUser = os.Getenv("USER")
+	if logEnv == "dev" {
+		logEnv = logUser
+	}
 	loggers = make(map[string]*XLogger)
 }
