@@ -50,15 +50,15 @@ func (p *CacheTable) Count(k interface{}, v interface{}) int {
 }
 
 func (p *CacheTable) Set(k interface{}, v interface{}, l ...int) *CacheItem {
-	p.RLock()
-	defer p.RUnlock()
-
 	lifetime := 0 * time.Second
 	if len(l) > 0 {
 		lifetime = time.Duration(l[0]) * time.Second
 	}
 	item := createCacheItem(k, v, lifetime)
+
+	p.Lock()
 	p.items[k] = &item
+	p.Unlock()
 	return &item
 }
 
@@ -76,7 +76,9 @@ func (p *CacheTable) Get(k interface{}) (interface{}, error) {
 	p.RUnlock()
 
 	if r.Expired() {
+		p.Lock()
 		delete(p.items, k)
+		p.Unlock()
 		return nil, ErrNil
 	}
 
@@ -84,7 +86,10 @@ func (p *CacheTable) Get(k interface{}) (interface{}, error) {
 }
 
 func (p *CacheTable) Item(k interface{}) *CacheItem {
+	p.RLock()
 	r, ok := p.items[k]
+	p.RUnlock()
+
 	r.Lock()
 	defer r.Unlock()
 
@@ -110,12 +115,14 @@ func (p *CacheTable) Exists(k interface{}) bool {
 }
 
 func (p *CacheTable) Delete(k interface{}) (*CacheItem, error) {
-	r, ok := p.items[k]
 	p.RLock()
-	defer p.RUnlock()
+	r, ok := p.items[k]
+	p.RUnlock()
 
 	if ok {
+		p.Lock()
 		delete(p.items, k)
+		p.ULock()
 		return r, nil
 	}
 	return nil, ErrNil
