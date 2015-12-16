@@ -122,7 +122,7 @@ func (p *CacheTable) Delete(k interface{}) (*CacheItem, error) {
 	if ok {
 		p.Lock()
 		delete(p.items, k)
-		p.Ulock()
+		p.Unlock()
 		return r, nil
 	}
 	return nil, ErrNil
