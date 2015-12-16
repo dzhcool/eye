@@ -67,9 +67,9 @@ func (p *CacheTable) Add(k interface{}, v interface{}, l ...int) *CacheItem {
 }
 
 func (p *CacheTable) Get(k interface{}) (interface{}, error) {
+	r.Lock()
 	r, ok := p.items[k]
-	// r.Lock()
-	// defer r.Unlock()
+	r.Unlock()
 	if !ok {
 		return nil, ErrNil
 	}
