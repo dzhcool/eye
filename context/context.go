@@ -51,7 +51,7 @@ func (ctx *Context) SetCookie(name string, value string, others ...interface{}) 
 
 //json接口返回
 func (ctx *Context) WriteJson(content []byte) error {
-	ctx.Output.Header("Content-Type", "application/json; charset=utf-8")
+	ctx.Output.Header("Content-Type", "application/x-javascript; charset=utf-8")
 	ctx.Output.Status = 200
 	callback := template.JSEscapeString(ctx.Input.Query("_callback"))
 	if len(callback) > 0 {

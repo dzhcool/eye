@@ -191,7 +191,7 @@ func sanitizeValue(v string) string {
 // Json writes json to response body.
 // if coding is true, it converts utf-8 to \u0000 type.
 func (output *EyeOutput) Json(data interface{}, hasIndent bool, coding bool) error {
-	output.Header("Content-Type", "application/json; charset=utf-8")
+	output.Header("Content-Type", "application/x-javascript; charset=utf-8")
 	var content []byte
 	var err error
 	if hasIndent {
