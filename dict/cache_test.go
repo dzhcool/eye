@@ -5,11 +5,8 @@
 package dict
 
 import (
-	// "reflect"
 	"github.com/pquerna/ffjson/ffjson"
-	"log"
 	"testing"
-	"time"
 )
 
 type Ad struct {
@@ -33,7 +30,7 @@ func TestCache(t *testing.T) {
 	)
 	cacheTest := Cache("test")
 	//存储
-	cacheTest.Set(k, v, 0*time.Second)
+	cacheTest.Set(k, v, 0)
 
 	//查询缓存值
 	val, err := cacheTest.String(cacheTest.Get(k))
@@ -59,9 +56,26 @@ func TestJson(t *testing.T) {
 	d := []Ad{buf}
 	rest.Data = d
 
-	json, err := ffjson.Marshal(rest)
+	_, err = ffjson.Marshal(rest)
 	if err != nil {
 		t.Fatal("encode json error", err)
 	}
-	log.Println(string(json))
+}
+
+func TestDel(t *testing.T) {
+	var (
+		k = "testdel"
+		v = "testval"
+	)
+	cacheTest := Cache("test")
+	//存储
+	cacheTest.Set(k, v)
+
+	cacheTest.Delete(k)
+
+	//查询缓存值
+	val, err := cacheTest.String(cacheTest.Get(k))
+	if val == v {
+		t.Fatal("delete error", err)
+	}
 }
