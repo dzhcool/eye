@@ -17,7 +17,7 @@ import (
 
 //启动pprof
 func StartPprof() {
-	pprofsock := os.Getenv("GOPPROF")
+	pprofsock := os.Getenv("GOPPROFSOCK")
 	go func() {
 		defer func() {
 			if err := recover(); err != nil {

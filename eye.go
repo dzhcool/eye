@@ -2,8 +2,10 @@ package eye
 
 import (
 	"log"
+	"os"
 	"path"
 	"runtime"
+	"strings"
 )
 
 const VERSION = "1.0.0"
@@ -31,7 +33,9 @@ func Run() {
 func init() {
 	EyeApp = NewApp()
 	//初始化默认配置
-	StartPprof()
+	if strings.ToUpper(os.Getenv("GOPPROF")) == "ON" {
+		StartPprof()
+	}
 
 	runtime.GOMAXPROCS(runtime.NumCPU())
 	log.Println("[Eye]Run As NumCPU:", runtime.NumCPU())
