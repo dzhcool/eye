@@ -25,12 +25,12 @@ func NewApp() *App {
 
 func (p *App) Run() {
 	running := make(chan bool, 1)
-	addr := Env["GOADDR"]
-	lnet := Env["GONET"]
-	gosock := Env["GOSOCK"]
+	addr := ":" + os.Getenv("GOADDR")
+	lnet := os.Getenv("GONET")
+	gosock := os.Getenv("GOSOCK")
 
 	//启动程序监听
-	if Env["GRACEFUL"] == "1" {
+	if strings.ToUpper(os.Getenv("GRACEFUL")) == "ON" {
 		go func() {
 			endless.DefaultReadTimeOut = 3 * time.Second
 			endless.DefaultWriteTimeOut = 5 * time.Second

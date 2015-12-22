@@ -12,49 +12,61 @@ import (
 	"path/filepath"
 	"runtime"
 	"runtime/debug"
+	"strings"
 	"time"
 )
 
 //启动pprof
 func StartPprof() {
 	pprofsock := os.Getenv("GOPPROFSOCK")
+	pprofport := os.Getenv("GOPPROFPORT")
+	lnet := os.Getenv("GONET")
 	go func() {
 		defer func() {
 			if err := recover(); err != nil {
-				log.Println("[Eye] pprof panic", err)
+				log.Println("[Eye][pprof] pprof panic", err)
 			}
 		}()
 		if len(pprofsock) <= 0 {
-			panic(`[Eye] pprof env "GOPPROF" not conf`)
+			panic(`[Eye][pprof] env "GOPPROF" not conf`)
 		}
 		_, err := os.Stat(filepath.Dir(pprofsock))
 		if err != nil {
-			panic("[Eye] pprof unixsock path not exist")
+			panic("[Eye][pprof] unixsock path not exist")
 		}
 		profServeMux := http.NewServeMux()
 		profServeMux.HandleFunc("/debug/pprof/", pprof.Index)
 		profServeMux.HandleFunc("/debug/pprof/cmdline", pprof.Cmdline)
 		profServeMux.HandleFunc("/debug/pprof/profile", pprof.Profile)
 		profServeMux.HandleFunc("/debug/pprof/symbol", pprof.Symbol)
-		profServeMux.HandleFunc("/gc", PrintGCSummary)
+		profServeMux.HandleFunc("/debug/gc", PrintGCSummary)
 
-		exec.Command("/bin/sh", "-c", "rm "+pprofsock).Run()
-		unix, err := net.Listen("unix", pprofsock)
-		exec.Command("/bin/sh", "-c", "chmod a+w "+pprofsock).Run()
-		if err != nil {
-			log.Println("[Eey]Listen error:", err)
+		if strings.ToUpper(lnet) == "TCP" {
+			err := http.ListenAndServe(":"+pprofport, profServeMux)
+			if err != nil {
+				log.Println("start startPprof error")
+				panic(err)
+			}
+		} else {
+			exec.Command("/bin/sh", "-c", "rm "+pprofsock).Run()
+			unix, err := net.Listen("unix", pprofsock)
+			exec.Command("/bin/sh", "-c", "chmod a+w "+pprofsock).Run()
+
+			if err != nil {
+				log.Println("[Eey][pprof]Listen error:", err)
+			}
+
+			log.Println("[Eey][pprof]Listen as unix:", pprofsock)
+			err = fcgi.Serve(unix, profServeMux)
+
+			if err != nil {
+				log.Println("[Eey][pprof]Listen error:", err)
+			}
 		}
-		log.Println("[Eey][pprof]Listen as unix:", pprofsock)
-		fcgi.Serve(unix, profServeMux)
 	}()
 }
 
 var startTime = time.Now()
-var pid int
-
-func init() {
-	pid = os.Getpid()
-}
 
 // print gc information to io.Writer
 func PrintGCSummary(w http.ResponseWriter, r *http.Request) {
