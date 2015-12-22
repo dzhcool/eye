@@ -42,6 +42,7 @@ func StartPprof() {
 		profServeMux.HandleFunc("/debug/gc", PrintGCSummary)
 
 		if strings.ToUpper(lnet) == "TCP" {
+			log.Println("[Eey][pprof] Listen as tcp:", pprofport)
 			err := http.ListenAndServe(":"+pprofport, profServeMux)
 			if err != nil {
 				log.Println("start startPprof error")

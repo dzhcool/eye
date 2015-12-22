@@ -25,7 +25,7 @@ func NewApp() *App {
 
 func (p *App) Run() {
 	running := make(chan bool, 1)
-	addr := ":" + os.Getenv("GOADDR")
+	addr := ":" + os.Getenv("GOPORT")
 	lnet := os.Getenv("GONET")
 	gosock := os.Getenv("GOSOCK")
 
@@ -48,7 +48,7 @@ func (p *App) Run() {
 				server := http.Server{
 					Addr:         addr,
 					Handler:      p.Handlers,
-					ReadTimeout:  3 * time.Second,
+					ReadTimeout:  5 * time.Second,
 					WriteTimeout: 5 * time.Second,
 				}
 				err := server.ListenAndServe()
