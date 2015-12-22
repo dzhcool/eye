@@ -4,8 +4,12 @@ import (
 	"fmt"
 	"github.com/dzhcool/eye/endless"
 	"log"
+	"net"
 	"net/http"
+	"net/http/fcgi"
 	"os"
+	"os/exec"
+	"strings"
 	"time"
 )
 
@@ -22,6 +26,8 @@ func NewApp() *App {
 func (p *App) Run() {
 	running := make(chan bool, 1)
 	addr := Env["GOADDR"]
+	lnet := Env["GONET"]
+	gosock := Env["GOSOCK"]
 
 	//启动程序监听
 	if Env["GRACEFUL"] == "1" {
@@ -36,20 +42,36 @@ func (p *App) Run() {
 			running <- true
 		}()
 	} else {
-		go func() {
-			server := http.Server{
-				Addr:         addr,
-				Handler:      p.Handlers,
-				ReadTimeout:  3 * time.Second,
-				WriteTimeout: 5 * time.Second,
-			}
-			err := server.ListenAndServe()
-			if err != nil {
-				log.Println("[Eey]Listen error:", err)
-			}
-			log.Println(fmt.Sprintf("[Eye]Server on %s stopped", addr))
-			running <- true
-		}()
+		if strings.ToUpper(lnet) == "TCP" {
+			log.Println("[Eey]Listen as", lnet, addr)
+			go func() {
+				server := http.Server{
+					Addr:         addr,
+					Handler:      p.Handlers,
+					ReadTimeout:  3 * time.Second,
+					WriteTimeout: 5 * time.Second,
+				}
+				err := server.ListenAndServe()
+				if err != nil {
+					log.Println("[Eey]Listen error:", err)
+				}
+				log.Println(fmt.Sprintf("[Eye]Server on %s stopped", addr))
+				running <- true
+			}()
+		} else {
+			log.Println("[Eey]Listen as", lnet, addr)
+			go func() {
+				exec.Command("/bin/sh", "-c", "rm "+gosock).Run()
+				unix, err := net.Listen("unix", gosock)
+				exec.Command("/bin/sh", "-c", "chmod a+w "+gosock).Run()
+				if err != nil {
+					log.Println("[Eey]Listen error:", err)
+				}
+				fcgi.Serve(unix, p.Handlers)
+				log.Println(fmt.Sprintf("[Eye]Server on %s stopped", addr))
+				running <- true
+			}()
+		}
 	}
 	<-running
 	log.Println("[Eye]All servers stopped. Exiting.")
