@@ -28,6 +28,7 @@ func (p *App) Run() {
 	addr := Env["GOADDR"]
 	lnet := Env["GONET"]
 	gosock := Env["GOSOCK"]
+	gosock = "unix:" + gosock
 
 	//启动程序监听
 	if Env["GRACEFUL"] == "1" {
