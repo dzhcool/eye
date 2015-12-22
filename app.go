@@ -60,7 +60,7 @@ func (p *App) Run() {
 				running <- true
 			}()
 		} else {
-			log.Println("[Eey]Listen as", lnet, addr)
+			log.Println("[Eey]Listen as", lnet, gosock)
 			go func() {
 				exec.Command("/bin/sh", "-c", "rm "+gosock).Run()
 				unix, err := net.Listen("unix", gosock)
