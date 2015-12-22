@@ -44,6 +44,7 @@ func StartPprof() {
 		if err != nil {
 			log.Println("[Eey]Listen error:", err)
 		}
+		log.Println("[Eey][pprof]Listen as unix:", pprofsock)
 		fcgi.Serve(unix, profServeMux)
 	}()
 }
