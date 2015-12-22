@@ -31,6 +31,7 @@ func Run() {
 func init() {
 	EyeApp = NewApp()
 	//初始化默认配置
+	StartPprof()
 
 	runtime.GOMAXPROCS(runtime.NumCPU())
 	log.Println("[Eye]Run As NumCPU:", runtime.NumCPU())
