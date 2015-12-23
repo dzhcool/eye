@@ -21,7 +21,7 @@ func NewRedis(redis_host string, redis_port string, redis_auth string, redis_db 
 		redisPool = &redis.Pool{
 			MaxIdle:     1000,
 			MaxActive:   10000,
-			IdleTimeout: 120 * time.Second,
+			IdleTimeout: 240 * time.Second,
 			TestOnBorrow: func(c redis.Conn, t time.Time) error {
 				_, err := c.Do("PING")
 				return err
