@@ -32,8 +32,8 @@ func (p *App) Run() {
 	//启动程序监听
 	if strings.ToUpper(os.Getenv("GRACEFUL")) == "ON" {
 		go func() {
-			endless.DefaultReadTimeOut = 3 * time.Second
-			endless.DefaultWriteTimeOut = 5 * time.Second
+			endless.DefaultReadTimeOut = 10 * time.Second
+			endless.DefaultWriteTimeOut = 10 * time.Second
 			err := endless.ListenAndServe(addr, p.Handlers)
 			if err != nil {
 				log.Println("[Eey]Listen error:", err)
@@ -48,8 +48,8 @@ func (p *App) Run() {
 				server := http.Server{
 					Addr:         addr,
 					Handler:      p.Handlers,
-					ReadTimeout:  5 * time.Second,
-					WriteTimeout: 5 * time.Second,
+					ReadTimeout:  10 * time.Second,
+					WriteTimeout: 10 * time.Second,
 				}
 				err := server.ListenAndServe()
 				if err != nil {
