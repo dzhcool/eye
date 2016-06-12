@@ -17,7 +17,7 @@ type Qhydra struct {
 	writer   *syslog.Writer
 }
 
-const EVENT_PREFIX string = "pcgameq_"
+const EVENT_PREFIX string = "xxx_"
 
 func NewQhydra(event string) *Qhydra {
 	if QMsg == nil {
